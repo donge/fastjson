@@ -1,8 +1,8 @@
 package fastjson_test
 
 import (
+	"github.com/donge/fastjson"
 	"fmt"
-	"github.com/valyala/fastjson"
 	"log"
 	"strconv"
 )
@@ -77,6 +77,40 @@ func ExampleValue_MarshalTo() {
 
 	// Output:
 	// items.0 = {"key":"foo","value":123.456,"arr":[1,"foo"]}
+	// items.1 = {"key":"bar","field":[3,4,5]}
+}
+
+func ExampleValue_FlattenTo() {
+	s := `{
+		"name": "John",
+		"items": [
+			{
+				"key": "foo",
+				"value": 123.456,
+				"arr": [1, "foo"]
+			},
+			{
+				"key": "bar",
+				"field": [3, 4, 5]
+			}
+		]
+	}`
+	var p fastjson.Parser
+	v, err := p.Parse(s)
+	if err != nil {
+		log.Fatalf("cannot parse json: %s", err)
+	}
+
+	// Marshal items.0 into newly allocated buffer.
+	buf := v.FlattenTo(nil,"")
+	fmt.Printf("items.0 = %s\n", buf)
+
+	// Re-use buf for marshaling items.1.
+	buf = v.Get("items", "1").FlattenTo(buf[:0], "")
+	fmt.Printf("items.1 = %s\n", buf)
+
+	// Output:
+	// items.0 = {"name":"John","items.0.key":"foo","items.0.value":123.456,"items.0.arr":[1,"foo"],"items.1.key":"bar","items.1.field":[3,4,5]}
 	// items.1 = {"key":"bar","field":[3,4,5]}
 }
 

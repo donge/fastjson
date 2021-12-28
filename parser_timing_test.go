@@ -3,6 +3,7 @@ package fastjson
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/jeremywohl/flatten"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -129,6 +130,64 @@ func BenchmarkMarshalTo(b *testing.B) {
 	})
 }
 
+
+func BenchmarkFlattenTo(b *testing.B) {
+	b.Run("small", func(b *testing.B) {
+		benchmarkFlattenTo(b, smallFixture)
+	})
+	b.Run("medium", func(b *testing.B) {
+		benchmarkFlattenTo(b, mediumFixture)
+	})
+	b.Run("large", func(b *testing.B) {
+		benchmarkFlattenTo(b, largeFixture)
+	})
+	b.Run("canada", func(b *testing.B) {
+		benchmarkFlattenTo(b, canadaFixture)
+	})
+	b.Run("citm", func(b *testing.B) {
+		benchmarkFlattenTo(b, citmFixture)
+	})
+	b.Run("twitter", func(b *testing.B) {
+		benchmarkFlattenTo(b, twitterFixture)
+	})
+}
+
+///https://github.com/jeremywohl/flatten
+func BenchmarkJeremywohlFlatten(b *testing.B) {
+	b.Run("small", func(b *testing.B) {
+		benchmarkJeremywohlFlatten(b, smallFixture)
+	})
+	b.Run("medium", func(b *testing.B) {
+		benchmarkJeremywohlFlatten(b, mediumFixture)
+	})
+	b.Run("large", func(b *testing.B) {
+		benchmarkJeremywohlFlatten(b, largeFixture)
+	})
+	b.Run("canada", func(b *testing.B) {
+		benchmarkJeremywohlFlatten(b, canadaFixture)
+	})
+	b.Run("citm", func(b *testing.B) {
+		benchmarkJeremywohlFlatten(b, citmFixture)
+	})
+	b.Run("twitter", func(b *testing.B) {
+		benchmarkJeremywohlFlatten(b, twitterFixture)
+	})
+}
+
+func benchmarkJeremywohlFlatten(b *testing.B, s string) {
+	p := benchPool.Get()
+	b.ReportAllocs()
+	b.SetBytes(int64(len(s)))
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			// It is ok calling v.MarshalTo from concurrent
+			// goroutines, since MarshalTo doesn't modify v.
+			_, _ = flatten.FlattenString(s, "", flatten.DotStyle)
+		}
+	})
+	benchPool.Put(p)
+}
+
 func benchmarkMarshalTo(b *testing.B, s string) {
 	p := benchPool.Get()
 	v, err := p.Parse(s)
@@ -144,6 +203,27 @@ func benchmarkMarshalTo(b *testing.B, s string) {
 			// It is ok calling v.MarshalTo from concurrent
 			// goroutines, since MarshalTo doesn't modify v.
 			b = v.MarshalTo(b[:0])
+		}
+	})
+	benchPool.Put(p)
+}
+
+
+func benchmarkFlattenTo(b *testing.B, s string) {
+	p := benchPool.Get()
+	v, err := p.Parse(s)
+	if err != nil {
+		panic(fmt.Errorf("unexpected error: %s", err))
+	}
+
+	b.ReportAllocs()
+	b.SetBytes(int64(len(s)))
+	b.RunParallel(func(pb *testing.PB) {
+		var b []byte
+		for pb.Next() {
+			// It is ok calling v.MarshalTo from concurrent
+			// goroutines, since MarshalTo doesn't modify v.
+			b = v.FlattenTo(b[:0],"")
 		}
 	})
 	benchPool.Put(p)

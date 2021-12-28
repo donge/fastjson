@@ -197,6 +197,36 @@ BenchmarkValidate/citm/fastjson          	    1000	   1684430 ns/op	1025.39 MB/s
 BenchmarkValidate/twitter/stdjson        	     500	   2849439 ns/op	 221.63 MB/s	     312 B/op	       6 allocs/op
 BenchmarkValidate/twitter/fastjson       	    2000	   1036796 ns/op	 609.10 MB/s	       0 B/op	       0 allocs/op
 ```
+Benchmark results for Flatten json string:
+
+```
+BenchmarkFlattenTo
+BenchmarkFlattenTo/small
+BenchmarkFlattenTo/small-12         	36326812	        33.58 ns/op	5658.71 MB/s	       0 B/op	       0 allocs/op
+BenchmarkFlattenTo/medium
+BenchmarkFlattenTo/medium-12        	 1257339	       963.9 ns/op	2416.20 MB/s	    1576 B/op	      72 allocs/op
+BenchmarkFlattenTo/large
+BenchmarkFlattenTo/large-12         	   60742	     21287 ns/op	1320.88 MB/s	   48687 B/op	    1463 allocs/op
+BenchmarkFlattenTo/canada
+BenchmarkFlattenTo/canada-12        	     450	   2325548 ns/op	 967.97 MB/s	 8494581 B/op	  207891 allocs/op
+BenchmarkFlattenTo/citm
+BenchmarkFlattenTo/citm-12          	    1606	    694044 ns/op	2488.61 MB/s	 2873739 B/op	   58891 allocs/op
+BenchmarkFlattenTo/twitter
+BenchmarkFlattenTo/twitter-12       	    4170	    266778 ns/op	2367.19 MB/s	 1036135 B/op	   21882 allocs/op
+BenchmarkJeremywohlFlatten
+BenchmarkJeremywohlFlatten/small
+BenchmarkJeremywohlFlatten/small-12         	  608346	      2221 ns/op	  85.56 MB/s	    4262 B/op	      78 allocs/op
+BenchmarkJeremywohlFlatten/medium
+BenchmarkJeremywohlFlatten/medium-12        	   66382	     15090 ns/op	 154.34 MB/s	   36283 B/op	     415 allocs/op
+BenchmarkJeremywohlFlatten/large
+BenchmarkJeremywohlFlatten/large-12         	    4308	    276026 ns/op	 101.87 MB/s	  729351 B/op	    6261 allocs/op
+BenchmarkJeremywohlFlatten/canada
+BenchmarkJeremywohlFlatten/canada-12        	      24	  43807587 ns/op	  51.39 MB/s	90084105 B/op	  827399 allocs/op
+BenchmarkJeremywohlFlatten/citm
+BenchmarkJeremywohlFlatten/citm-12          	     139	   8309259 ns/op	 207.86 MB/s	16921280 B/op	  166615 allocs/op
+BenchmarkJeremywohlFlatten/twitter
+BenchmarkJeremywohlFlatten/twitter-12       	     327	   3762992 ns/op	 167.82 MB/s	 9315915 B/op	   68724 allocs/op
+```
 
 ## FAQ
 
