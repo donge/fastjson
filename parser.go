@@ -480,6 +480,38 @@ func (o *Object) MarshalTo(dst []byte) []byte {
 	return dst
 }
 
+// FlattenTo flat marshaled o to dst and returns the result.
+func (o *Object) FlattenTo(dst []byte, parent string) []byte {
+	// top level without parent key, append {}, other level append a delimiter .
+	if parent == "" {
+		dst = append(dst, '{')
+	} else {
+		parent = parent + "."
+	}
+
+	for i, kv := range o.kvs {
+		// if value type is object or array (not bottom level) not append the key
+		if (kv.v.t != TypeObject) && (kv.v.t != TypeArray || (len(kv.v.a)>0 && kv.v.a[0].t != TypeArray && kv.v.a[0].t != TypeObject)) {
+			if o.keysUnescaped {
+				dst = escapeString(dst, parent+kv.k)
+			} else {
+				dst = append(dst, '"')
+				dst = append(dst, parent+kv.k...)
+				dst = append(dst, '"')
+			}
+			dst = append(dst, ':')
+		}
+		dst = kv.v.FlattenTo(dst, parent+kv.k)
+		if i != len(o.kvs)-1 {
+			dst = append(dst, ","...)
+		}
+	}
+	if parent == "" {
+		dst = append(dst, '}')
+	}
+	return dst
+}
+
 // String returns string representation for the o.
 //
 // This function is for debugging purposes only. It isn't optimized for speed.
@@ -488,6 +520,11 @@ func (o *Object) String() string {
 	b := o.MarshalTo(nil)
 	// It is safe converting b to string without allocation, since b is no longer
 	// reachable after this line.
+	return b2s(b)
+}
+
+func (o *Object) FlatString() string {
+	b := o.FlattenTo(nil, "")
 	return b2s(b)
 }
 
@@ -607,6 +644,46 @@ func (v *Value) MarshalTo(dst []byte) []byte {
 	}
 }
 
+// FlattenTo flat v to dst and returns the result.
+func (v *Value) FlattenTo(dst []byte, parent string) []byte {
+	switch v.t {
+	case typeRawString:
+		dst = append(dst, '"')
+		dst = append(dst, v.s...)
+		dst = append(dst, '"')
+		return dst
+	case TypeObject:
+		return v.o.FlattenTo(dst, parent)
+	case TypeArray:
+		// bottom level array keep is simple type, append [...], not flat it
+		if len(v.a) > 0 && v.a[0].t != TypeArray && v.a[0].t != TypeObject {
+			dst = append(dst, '[')
+		}
+		for i, vv := range v.a {
+			dst = vv.FlattenTo(dst, parent+"."+strconv.Itoa(i))
+			if i != len(v.a)-1 {
+				dst = append(dst, ","...)
+			}
+		}
+		if len(v.a)>0 && v.a[0].t != TypeArray && v.a[0].t != TypeObject {
+			dst = append(dst, ']')
+		}
+		return dst
+	case TypeString:
+		return escapeString(dst, v.s)
+	case TypeNumber:
+		return append(dst, v.s...)
+	case TypeTrue:
+		return append(dst, "true"...)
+	case TypeFalse:
+		return append(dst, "false"...)
+	case TypeNull:
+		return append(dst, "null"...)
+	default:
+		panic(fmt.Errorf("BUG: unexpected Value type: %d", v.t))
+	}
+}
+
 // String returns string representation of the v.
 //
 // The function is for debugging purposes only. It isn't optimized for speed.
@@ -618,6 +695,11 @@ func (v *Value) String() string {
 	b := v.MarshalTo(nil)
 	// It is safe converting b to string without allocation, since b is no longer
 	// reachable after this line.
+	return b2s(b)
+}
+
+func (v *Value) FlatString() string {
+	b := v.FlattenTo(nil, "")
 	return b2s(b)
 }
 
