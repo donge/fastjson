@@ -502,8 +502,9 @@ func (o *Object) FlattenTo(dst []byte, parent string) []byte {
 			dst = append(dst, ':')
 		}
 		dst = kv.v.FlattenTo(dst, parent+kv.k)
-		if i != len(o.kvs)-1 {
-			dst = append(dst, ","...)
+		// TODO: fix a null struct with like "a": {},
+		if i != len(o.kvs)-1 && (dst[len(dst)-1]!=',' && dst[len(dst)-1]!='{') {
+			dst = append(dst, ',')
 		}
 	}
 	if parent == "" {
