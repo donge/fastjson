@@ -661,7 +661,7 @@ func (v *Value) FlattenTo(dst []byte, parent string) []byte {
 			dst = append(dst, '[')
 		}
 		for i, vv := range v.a {
-			dst = vv.FlattenTo(dst, parent+"."+strconv.Itoa(i))
+			dst = vv.FlattenTo(dst, parent+"["+strconv.Itoa(i)+"]")
 			if i != len(v.a)-1 {
 				dst = append(dst, ","...)
 			}
