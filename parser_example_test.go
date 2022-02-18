@@ -114,13 +114,8 @@ func ExampleValue_FlattenTo() {
 	// items[1] = {"key":"bar","field":[3,4,5]}
 }
 
-
-func ExampleRequestValue_FlattenTo() {
-	s := []byte( `{
-    "Get": 1,
-    "ParamMap": {},
-"ddd":"ddd"
-}`)
+func ExampleRequestArray_FlattenTo() {
+	s := []byte( `[{"email":"john@email.com","firstName":"John","id":10,"lastName":"James","password":"12345","phone":"12345","userStatus":1,"username":"theUser"}]`)
 	var p fastjson.Parser
 	v, err := p.ParseBytes(s)
 	if err != nil {
@@ -133,7 +128,7 @@ func ExampleRequestValue_FlattenTo() {
 
 
 	// Output:
-	// items.0 = {"Get":1,"ddd":"ddd"}
+	// items.0 = {"[0].email":"john@email.com","[0].firstName":"John","[0].id":10,"[0].lastName":"James","[0].password":"12345","[0].phone":"12345","[0].userStatus":1,"[0].username":"theUser"}
 }
 
 func ExampleValue_Get() {

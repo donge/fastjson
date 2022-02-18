@@ -656,6 +656,10 @@ func (v *Value) FlattenTo(dst []byte, parent string) []byte {
 	case TypeObject:
 		return v.o.FlattenTo(dst, parent)
 	case TypeArray:
+		// fix: top level array should have {} after flatten
+		if parent == "" {
+			dst = append(dst, '{')
+		}
 		// bottom level array keep is simple type, append [...], not flat it
 		if len(v.a) > 0 && v.a[0].t != TypeArray && v.a[0].t != TypeObject {
 			dst = append(dst, '[')
@@ -668,6 +672,9 @@ func (v *Value) FlattenTo(dst []byte, parent string) []byte {
 		}
 		if len(v.a)>0 && v.a[0].t != TypeArray && v.a[0].t != TypeObject {
 			dst = append(dst, ']')
+		}
+		if parent == "" {
+			dst = append(dst, '}')
 		}
 		return dst
 	case TypeString:
