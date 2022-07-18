@@ -90,6 +90,26 @@ func GetFloat64(data []byte, keys ...string) float64 {
 	return f
 }
 
+// GetFloat64Exact returns float64 value for the field identified by keys path
+// in JSON data.
+//
+// Array indexes may be represented as decimal numbers in keys.
+//
+// 0 is returned on error. Use Parser for proper error handling.
+//
+// Parser is faster for obtaining multiple fields from JSON.
+func GetFloat64Exact(data []byte, keys ...string) (float64, error) {
+	p := handyPool.Get()
+	v, err := p.ParseBytes(data)
+	if err != nil {
+		handyPool.Put(p)
+		return 0, err
+	}
+	f, err := v.GetFloat64Exact(keys...)
+	handyPool.Put(p)
+	return f, err
+}
+
 // GetBool returns boolean value for the field identified by keys path
 // in JSON data.
 //

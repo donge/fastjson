@@ -174,6 +174,22 @@ func TestGetFloat64(t *testing.T) {
 	}
 }
 
+func TestGetFloat64Exact(t *testing.T) {
+	data := []byte(`{"foo":"bar", "baz": 12.34, "zero":0}`)
+	f, e := GetFloat64Exact(data, "foo")
+	if e == nil || f != 0 {
+		t.Fatalf("unexpected non-zero value obtained: %f", f)
+	}
+	f, e = GetFloat64Exact(data, "baz")
+	if e != nil || f != 12.34 {
+		t.Fatalf("unexpected non-zero value obtained: %f", f)
+	}
+	f, e = GetFloat64Exact(data, "zero")
+	if e != nil || f != 0 {
+		t.Fatalf("unexpected non-zero value obtained: %f", f)
+	}
+}
+
 func TestGetBool(t *testing.T) {
 	data := []byte(`{"foo":"bar", "baz": true}`)
 

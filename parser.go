@@ -2,10 +2,11 @@ package fastjson
 
 import (
 	"fmt"
-	"github.com/donge/fastjson/fastfloat"
 	"strconv"
 	"strings"
 	"unicode/utf16"
+
+	"github.com/donge/fastjson/fastfloat"
 )
 
 // Parser parses JSON.
@@ -491,7 +492,7 @@ func (o *Object) FlattenTo(dst []byte, parent string) []byte {
 
 	for i, kv := range o.kvs {
 		// if value type is object or array (not bottom level) not append the key
-		if (kv.v.t != TypeObject) && (kv.v.t != TypeArray || (len(kv.v.a)>0 && kv.v.a[0].t != TypeArray && kv.v.a[0].t != TypeObject)) {
+		if (kv.v.t != TypeObject) && (kv.v.t != TypeArray || (len(kv.v.a) > 0 && kv.v.a[0].t != TypeArray && kv.v.a[0].t != TypeObject)) {
 			if o.keysUnescaped {
 				dst = escapeString(dst, parent+kv.k)
 			} else {
@@ -503,7 +504,7 @@ func (o *Object) FlattenTo(dst []byte, parent string) []byte {
 		}
 		dst = kv.v.FlattenTo(dst, parent+kv.k)
 		// TODO: fix a null struct with like "a": {},
-		if i != len(o.kvs)-1 && (dst[len(dst)-1]!=',' && dst[len(dst)-1]!='{') {
+		if i != len(o.kvs)-1 && (dst[len(dst)-1] != ',' && dst[len(dst)-1] != '{') {
 			dst = append(dst, ',')
 		}
 	}
@@ -670,7 +671,7 @@ func (v *Value) FlattenTo(dst []byte, parent string) []byte {
 				dst = append(dst, ","...)
 			}
 		}
-		if len(v.a)>0 && v.a[0].t != TypeArray && v.a[0].t != TypeObject {
+		if len(v.a) > 0 && v.a[0].t != TypeArray && v.a[0].t != TypeObject {
 			dst = append(dst, ']')
 		}
 		if parent == "" {
@@ -852,6 +853,19 @@ func (v *Value) GetFloat64(keys ...string) float64 {
 		return 0
 	}
 	return fastfloat.ParseBestEffort(v.s)
+}
+
+// GetFloat64Exact returns float64 value by the given keys path.
+//
+// Array indexes may be represented as decimal numbers in keys.
+//
+// error is returned for non-existing keys path or for invalid value type.
+func (v *Value) GetFloat64Exact(keys ...string) (float64, error) {
+	v = v.Get(keys...)
+	if v == nil || v.Type() != TypeNumber {
+		return 0, fmt.Errorf("type unmatch or null value key")
+	}
+	return fastfloat.ParseBestEffort(v.s), nil
 }
 
 // GetInt returns int value by the given keys path.
