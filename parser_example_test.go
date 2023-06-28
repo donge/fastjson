@@ -102,7 +102,7 @@ func ExampleValue_FlattenTo() {
 	}
 
 	// Marshal items.0 into newly allocated buffer.
-	buf := v.FlattenTo(nil,"")
+	buf := v.FlattenTo(nil, "")
 	fmt.Printf("items[0] = %s\n", buf)
 
 	// Re-use buf for marshaling items.1.
@@ -115,7 +115,7 @@ func ExampleValue_FlattenTo() {
 }
 
 func ExampleRequestArray_FlattenTo() {
-	s := []byte( `[{"email":"john@email.com","firstName":"John","id":10,"lastName":"James","password":"12345","phone":"12345","userStatus":1,"username":"theUser"}]`)
+	s := []byte(`[{"email":"john@email.com","firstName":"John","id":10,"lastName":"James","password":"12345","phone":"12345","userStatus":1,"username":"theUser"}]`)
 	var p fastjson.Parser
 	v, err := p.ParseBytes(s)
 	if err != nil {
@@ -123,12 +123,30 @@ func ExampleRequestArray_FlattenTo() {
 	}
 
 	// Marshal items.0 into newly allocated buffer.
-	buf := v.FlattenTo(nil,"")
+	buf := v.FlattenTo(nil, "")
 	fmt.Printf("items.0 = %s\n", buf)
-
 
 	// Output:
 	// items.0 = {"[0].email":"john@email.com","[0].firstName":"John","[0].id":10,"[0].lastName":"James","[0].password":"12345","[0].phone":"12345","[0].userStatus":1,"[0].username":"theUser"}
+}
+
+func ExampleObject_FlattenTo() {
+	s := `{"token":"e:xxx:12ABF456791005AN09XX","condition":{}}`
+	var p fastjson.Parser
+	v, err := p.Parse(s)
+	if err != nil {
+		log.Fatalf("cannot parse json: %s", err)
+	}
+
+	// Marshal items.0 into newly allocated buffer.
+	buf := v.FlattenTo(nil, "")
+	fmt.Printf("res = %s\n", buf)
+
+	buf = v.Get("token").FlattenTo(buf[:0], "")
+	fmt.Printf("token = %s\n", buf)
+	// Output:
+	// res = {"token":"e:xxx:12ABF456791005AN09XX"}
+	// token = "e:xxx:12ABF456791005AN09XX"
 }
 
 func ExampleValue_Get() {
