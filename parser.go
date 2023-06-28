@@ -509,6 +509,9 @@ func (o *Object) FlattenTo(dst []byte, parent string) []byte {
 		}
 	}
 	if parent == "" {
+		if len(dst) > 0 && dst[len(dst)-1] == ',' {
+			dst = dst[:len(dst)-1]
+		}
 		dst = append(dst, '}')
 	}
 	return dst
