@@ -1,5 +1,10 @@
 package fastjson
 
+import (
+	"bytes"
+	"strconv"
+)
+
 var handyPool ParserPool
 
 // GetString returns string value for the field identified by keys path
@@ -187,4 +192,57 @@ func MustParseBytes(b []byte) *Value {
 		panic(err)
 	}
 	return v
+}
+
+func GetStringImproved(data []byte, keys ...string) string {
+	ok, v := GetValImproved(data, len(keys), keys...)
+	if !ok {
+		return ""
+	}
+	return string(v.GetStringBytes())
+}
+
+func GetValImproved(data []byte, endIndex int, keys ...string) (ok bool, res Value) {
+	p := handyPool.Get()
+	parser, err := p.ParseBytes(data)
+	defer handyPool.Put(p)
+	if err != nil {
+		return
+	}
+
+	for i := len(keys); i > 0; i-- {
+		v := parser.Get(keys[:i]...)
+		if v != nil {
+			if i == endIndex {
+				ok = true
+				res = *v
+				return
+			}
+
+			if v.Type() == TypeString {
+				json := jsonStr2Json(v.GetStringBytes())
+				if len(json) > 0 {
+					return GetValImproved(json, endIndex-i, keys[i:endIndex]...)
+				}
+			}
+
+		}
+	}
+	return
+}
+
+func jsonStr2Json(str []byte) []byte {
+	if bytes.HasPrefix(str, []byte("{")) || bytes.HasPrefix(str, []byte("[")) {
+		return str
+	}
+
+	if bytes.HasPrefix(str, []byte("\"")) {
+		unquoted, err := strconv.Unquote(b2s(str))
+		if err != nil {
+			return nil
+		}
+		return jsonStr2Json(s2b(unquoted))
+	}
+
+	return nil
 }
