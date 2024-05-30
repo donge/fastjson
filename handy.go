@@ -199,7 +199,14 @@ func GetStringImproved(data []byte, keys ...string) string {
 	if !ok {
 		return ""
 	}
-	return string(v.GetStringBytes())
+	var bs []byte
+	switch v.t {
+	case TypeString, typeRawString:
+		bs = v.GetStringBytes()
+	default:
+		bs = v.MarshalTo(nil)
+	}
+	return string(bs)
 }
 
 func GetValImproved(data []byte, endIndex int, keys ...string) (ok bool, res Value) {
