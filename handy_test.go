@@ -105,32 +105,32 @@ func TestGetStringImproved(t *testing.T) {
 
 	// normal path
 	s := GetStringImproved(data, "Body", "HIPMessageServer", "action")
-	if s != "MES0018" {
-		t.Fatalf("unexpected value obtained; got %q; want %q", s, "MES0018")
+	if *s != "MES0018" {
+		t.Fatalf("unexpected value obtained; got %q; want %q", *s, "MES0018")
 	}
 
 	// object path
 	s = GetStringImproved(data, "Body", "HIPMessageServer")
-	if s != `{"action":"MES0018","number":0232}` {
-		t.Fatalf("unexpected value obtained; got %q; want %q", s, `{"action":"MES0018","number":0232}`)
+	if *s != `{"action":"MES0018","number":0232}` {
+		t.Fatalf("unexpected value obtained; got %q; want %q", *s, `{"action":"MES0018","number":0232}`)
 	}
 
 	// number path
 	s = GetStringImproved(data, "Body", "HIPMessageServer", "number")
-	if s != "0232" {
-		t.Fatalf("unexpected value obtained; got %q; want %q", s, "0232")
+	if *s != "0232" {
+		t.Fatalf("unexpected value obtained; got %q; want %q", *s, "0232")
 	}
 
 	// non-existing path
 	s = GetStringImproved(data, "foo", "zzz")
-	if s != "" {
-		t.Fatalf("unexpected non-empty value obtained: %q", s)
+	if s != nil {
+		t.Fatalf("unexpected non-empty value obtained: %q", *s)
 	}
 
 	// invalid json
 	s = GetStringImproved([]byte("invalid json"), "foobar", "baz")
-	if s != "" {
-		t.Fatalf("unexpected non-empty value obtained: %q", s)
+	if s != nil {
+		t.Fatalf("unexpected non-empty value obtained: %q", *s)
 	}
 }
 
