@@ -194,10 +194,10 @@ func MustParseBytes(b []byte) *Value {
 	return v
 }
 
-func GetStringImproved(data []byte, keys ...string) string {
+func GetStringImproved(data []byte, keys ...string) *string {
 	ok, v := GetValImproved(data, len(keys), keys...)
 	if !ok {
-		return ""
+		return nil
 	}
 	var bs []byte
 	switch v.t {
@@ -206,7 +206,8 @@ func GetStringImproved(data []byte, keys ...string) string {
 	default:
 		bs = v.MarshalTo(nil)
 	}
-	return string(bs)
+	res := string(bs)
+	return &res
 }
 
 func GetValImproved(data []byte, endIndex int, keys ...string) (ok bool, res Value) {
