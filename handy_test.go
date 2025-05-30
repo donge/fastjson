@@ -97,7 +97,21 @@ func TestGetStringImproved(t *testing.T) {
         "HIPMessageServer": {
             "action": "MES0018",
             "number": 0232
-        }
+        },
+		"messages": [
+			{
+				"content": "第一段信息",
+				"role": "user"
+			},
+			{
+				"content": "倒数第二段信息",
+				"role": "assistant"
+			},
+			{
+				"content": "最后一段信息",
+				"role": "user"
+			}
+		]
     },
     "Header": "header here",
     "clin": "www.servicewall.com"
@@ -131,6 +145,26 @@ func TestGetStringImproved(t *testing.T) {
 	s = GetStringImproved([]byte("invalid json"), "foobar", "baz")
 	if s != "" {
 		t.Fatalf("unexpected non-empty value obtained: %q", s)
+	}
+
+	s = GetStringImproved(data, "Body", "messages", "-1", "content")
+	if s != "最后一段信息" {
+		t.Fatalf("unexpected value obtained; got %q; want %q", s, "最后一段信息")
+	}
+
+	s = GetStringImproved(data, "Body", "messages", "-2", "content")
+	if s != "倒数第二段信息" {
+		t.Fatalf("unexpected value obtained; got %q; want %q", s, "倒数第二段信息")
+	}
+
+	s = GetStringImproved(data, "Body", "messages", "1", "content")
+	if s != "倒数第二段信息" {
+		t.Fatalf("unexpected value obtained; got %q; want %q", s, "倒数第二段信息")
+	}
+
+	s = GetStringImproved(data, "Body", "messages", "-100", "content")
+	if s != "" {
+		t.Fatalf("unexpected value obtained; got %q; want %q", s, "")
 	}
 }
 

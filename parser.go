@@ -804,10 +804,14 @@ func (v *Value) Get(keys ...string) *Value {
 			}
 		} else if v.t == TypeArray {
 			n, err := strconv.Atoi(key)
-			if err != nil || n < 0 || n >= len(v.a) {
+			if err != nil || n >= len(v.a) || len(v.a)+n < 0 {
 				return nil
 			}
-			v = v.a[n]
+			if n < 0 {
+				v = v.a[len(v.a)+n]
+			} else {
+				v = v.a[n]
+			}
 		} else {
 			return nil
 		}
