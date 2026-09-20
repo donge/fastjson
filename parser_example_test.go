@@ -114,7 +114,7 @@ func ExampleValue_FlattenTo() {
 	// items[1] = {"key":"bar","field":[3,4,5]}
 }
 
-func ExampleRequestArray_FlattenTo() {
+func ExampleValue_FlattenTo_array() {
 	s := []byte(`[{"email":"john@email.com","firstName":"John","id":10,"lastName":"James","password":"12345","phone":"12345","userStatus":1,"username":"theUser"}]`)
 	var p fastjson.Parser
 	v, err := p.ParseBytes(s)

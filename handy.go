@@ -217,23 +217,9 @@ func GetValImproved(data []byte, endIndex int, keys ...string) (ok bool, res Val
 		return
 	}
 
-	for i := len(keys); i > 0; i-- {
-		v := parser.Get(keys[:i]...)
-		if v != nil {
-			if i == endIndex {
-				ok = true
-				res = *v
-				return
-			}
-
-			if v.Type() == TypeString {
-				json := jsonStr2Json(v.GetStringBytes())
-				if len(json) > 0 {
-					return GetValImproved(json, endIndex-i, keys[i:endIndex]...)
-				}
-			}
-
-		}
+	ok, v := parser.GetValImproved(endIndex, keys...)
+	if ok && v != nil {
+		res = *v
 	}
 	return
 }
